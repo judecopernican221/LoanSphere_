@@ -1,0 +1,124 @@
+version: "3.9"
+
+volumes:
+  postgres_data:
+  redis_data:
+  qdrant_data:
+
+
+x-app-env: &app-env
+  DATABASE_URL: "postgresql+asyncpg://loanuser:loanpass@postgres:5432/loandb"
+  DATABASE_URL_SYNC: "postgresql://loanuser:loanpass@postgres:5432/loandb"
+  REDIS_URL: "redis://redis:6379/0"
+  QDRANT_HOST: "qdrant"
+  QDRANT_PORT: "6333"
+  ENVIRONMENT: "development"
+  DEBUG: "true"
+  GROQ_MODEL: "${GROQ_MODEL:-llama-3.1-8b-instant}"
+
+services:
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: loan_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: loanuser
+      POSTGRES_PASSWORD: loanpass
+      POSTGRES_DB: loandb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U loanuser -d loandb" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    container_name: loan_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  qdrant:
+    image: qdrant/qdrant:v1.7.4
+    container_name: loan_qdrant
+    restart: unless-stopped
+    volumes:
+      - qdrant_data:/qdrant/storage
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: loan_api
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      SECRET_KEY: "${SECRET_KEY:-dev-secret-key-change-in-production}"
+      GROQ_API_KEY: "${GROQ_API_KEY:-}"
+    volumes:
+      - ./app:/app/app
+      - ./scripts:/app/scripts
+      - ./migrations:/app/migrations
+      - ./alembic.ini:/app/alembic.ini
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  worker:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: loan_worker
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+      SECRET_KEY: "${SECRET_KEY:-dev-secret-key-change-in-production}"
+      GROQ_API_KEY: "${GROQ_API_KEY:-}"
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_started
+    command: celery -A app.workers.celery_app worker --loglevel=info --pool=solo
+
+  beat:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: loan_beat
+    restart: unless-stopped
+    environment:
+      <<: *app-env
+    volumes:
+      - ./app:/app/app
+    depends_on:
+      - redis
+    command: celery -A app.workers.celery_app beat --loglevel=info
